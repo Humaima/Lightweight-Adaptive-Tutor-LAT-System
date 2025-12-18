@@ -60,3 +60,107 @@ After running, check the output/ directory for:
 - Statistical analysis results (statistical_results.csv)
 - Policy heatmap visualizations (policy_visualization.png)
 
+## 📊 Performance Metrics
+
+The system evaluates tutoring strategies using:
+
+| Metric | Description | Expected RL Performance |
+|--------|-------------|-------------------------|
+| 📚 **Knowledge Gain** | Improvement in student knowledge | 📈 Higher than baselines |
+| ✅ **Success Rate** | % of correct answers | 🎯 70-85% with adaptation |
+| ⚖️ **Optimal Challenge** | % in productive struggle zone (0.3 < P(correct) < 0.7) | 🔝 Maximized by RL |
+| 🏆 **Cumulative Reward** | Total reward over episodes | 💪 Higher after convergence |
+
+## 🔧 Configuration
+
+## Key Parameters
+
+```bash
+# Environment (environment.py)
+knowledge_levels = 10          # Discrete knowledge bins
+consecutive_bounds = 7         # Consecutive counter range
+alpha = 5                      # Sigmoid slope for response probability
+lambda_gain = 0.05            # Learning gain coefficient
+
+# Q-Learning (q_learning_agent.py)
+learning_rate = 0.1           # η - Q-value update step
+discount_factor = 0.9         # γ - Future reward weight
+epsilon_init = 1.0            # Initial exploration rate
+epsilon_min = 0.1             # Minimum exploration rate
+
+# Training (main.py)
+num_episodes = 10000          # Training episodes
+steps_per_episode = 20        # Steps per episode
+num_test_episodes = 1000      # Evaluation episodes per method
+```
+## 🧪 Methodology
+
+## 🧪 Methodology
+
+### Why Q-Learning?
+- **Simplicity**: Tabular representation for small state spaces (70 states)
+- **Optimality**: Guaranteed convergence to optimal policy
+- **Interpretability**: Easily visualizable and explainable policies
+- **Efficiency**: Fast training and inference without neural networks
+
+### Baseline Strategies
+1. **Fixed Schedule (FS)**: Non-adaptive, cyclic difficulty progression
+2. **Performance Threshold (PT)**: Simple rule-based adaptation based on consecutive responses
+
+## 📈 Results & Analysis
+
+The system generates comprehensive analysis including:
+- **Training progress plots** (rewards, ϵ-decay)
+- **Comparative performance bar charts**
+- **Metric distribution histograms**
+- **Statistical significance tests** (paired t-tests with Cohen's d)
+- **Policy heatmap visualizations**
+
+## 🔮 Future Enhancements
+
+- [ ] **Neural network function approximation** for larger state spaces
+- [ ] **Transfer learning** across student populations
+- [ ] **Multi-student simultaneous tutoring**
+- [ ] **Integration with real student interaction data**
+- [ ] **Advanced exploration strategies** (Thompson sampling, UCB)
+- [ ] **Curriculum learning** with structured knowledge progression
+
+## 🐛 Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| **Q-table file not found** | Ensure `main.py` completes training. Check `output/` directory exists. |
+| **Low success rates** | May be expected with random initial students. Check training convergence. |
+| **Statistical tests not running** | Ensure sufficient evaluation episodes (minimum 1,000 per method). |
+| **Slow execution** | Reduce `num_episodes` for testing or implement parallel processing. |
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. **Fork the repository**
+2. **Create your feature branch** (`git checkout -b feature/AmazingFeature`)
+3. **Commit your changes** (`git commit -m 'Add some AmazingFeature'`)
+4. **Push to the branch** (`git push origin feature/AmazingFeature`)
+5. **Open a Pull Request**
+
+## 📚 Acknowledgments
+
+- Built with **NumPy, Matplotlib, SciPy, Pandas, Scikit-learn**
+- Inspired by adaptive learning research and intelligent tutoring systems literature
+- Q-Learning algorithm from **Watkins & Dayan (1992)**
+
+## 📞 Contact
+
+For questions, issues, or suggestions:
+- Open an issue in the repository
+- Contact: humaimaanwar123@gmail.com
+
+---
+
+**Last Updated**: December 2025
+**Version**: 1.0
