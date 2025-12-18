@@ -1,339 +1,142 @@
 # Lightweight Adaptive Tutor (LAT) System
 
-## Overview
+[![Python 3.8+](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Reinforcement Learning](https://img.shields.io/badge/RL-Q--Learning-orange.svg)](https://en.wikipedia.org/wiki/Q-learning)
 
-The **Lightweight Adaptive Tutor (LAT)** is a reinforcement learning-based intelligent tutoring system designed to optimize student learning outcomes through adaptive question difficulty selection. This project implements a Q-Learning agent that dynamically adjusts problem difficulty based on student knowledge and performance, compared against rule-based baseline strategies.
+<img width="627" height="206" alt="image" src="https://github.com/user-attachments/assets/da7fcc7a-475d-44c2-864c-2b980781e5f6" />
 
-### Key Features
+An intelligent tutoring system that uses reinforcement learning to dynamically adapt question difficulty based on student performance, optimizing learning outcomes through personalized challenge selection.
 
-- **Reinforcement Learning Agent**: Implements tabular Q-Learning with ϵ-greedy exploration
-- **Stochastic Student Simulator**: Models realistic student knowledge evolution and performance
-- **Adaptive Difficulty Management**: Learns optimal difficulty selection through interaction
-- **Comparative Analysis**: Benchmarks RL agent against two baseline tutoring strategies
-- **Comprehensive Evaluation**: Statistical testing, visualization, and policy interpretability analysis
+## 📋 Overview
 
----
+The **Lightweight Adaptive Tutor (LAT)** implements a Q-Learning agent that selects optimal question difficulties in real-time, creating personalized learning paths. The system simulates student-tutor interactions and benchmarks the RL agent against rule-based baseline strategies to demonstrate improved learning efficiency.
 
-## Project Architecture
+### ✨ Key Features
 
-### Core Components
+- **🤖 Reinforcement Learning Agent**: Tabular Q-Learning with ϵ-greedy exploration
+- **🎓 Stochastic Student Simulator**: Realistic knowledge evolution modeling
+- **📈 Adaptive Difficulty Management**: Dynamic question selection based on performance
+- **📊 Comparative Analysis**: Benchmarks against fixed schedule and threshold-based baselines
+- **🔍 Comprehensive Evaluation**: Statistical testing, visualization, and policy analysis
 
-#### 1. **`environment.py`** - Student Knowledge Simulator
-The MDP environment that models student-tutor interactions.
+## 🏗️ Architecture
 
-**Key Features:**
-- **State Space**: Two-dimensional state $(K_t, C_t)$
-  - $K_t$: Knowledge level (10 discrete levels from 0.0 to 1.0)
-  - $C_t$: Consecutive response counter (-3 to +3, indicating consecutive correct/incorrect responses)
-  - Total states: 70 possible states
+| Component | Description |
+|-----------|-------------|
+| **`environment.py`** | MDP environment simulating student-tutor interactions (70 states, 3 actions) |
+| **`q_learning_agent.py`** | Q-Learning agent with ϵ-greedy exploration and tabular Q-values |
+| **`baselines.py`** | Two rule-based tutoring strategies for comparison |
+| **`train_evaluation.py`** | Training orchestrator and evaluation pipeline |
+| **`analyze.py`** | Statistical analysis and visualization tools |
+| **`main.py`** | Complete execution pipeline |
 
-- **Action Space**: Three difficulty levels
-  - "Easy" (difficulty=1)
-  - "Medium" (difficulty=2)
-  - "Hard" (difficulty=3)
+## 🚀 Quick Start
 
-- **Student Response Model**: Logistic function for probability of correct answer
-  $$P(\text{Correct}|S_t, a_t) = \sigma(\alpha(K_t - \beta_d))$$
-  where $\alpha$ is the slope parameter and $\beta_d$ is the difficulty threshold
-
-- **Knowledge Dynamics** (Equation 3):
-  - Successful response: $K_{t+1} = K_t + \lambda \cdot d$ (learning gain proportional to difficulty)
-  - Failed response: $K_{t+1} = K_t - \phi$ (penalty for incorrect answer)
-
-- **Reward Structure**:
-  - Positive rewards for correct answers (scaled by difficulty)
-  - Negative rewards for incorrect answers (penalized based on difficulty)
-
-#### 2. **`q_learning_agent.py`** - Q-Learning Agent
-Implements tabular Q-Learning for optimal policy discovery.
-
-**Features:**
-- Q-table initialization: zeros $(70 \times 3)$
-- **Q-Learning Update Rule**:
-  $$Q(s,a) \leftarrow Q(s,a) + \eta[r + \gamma \max_{a'} Q(s',a') - Q(s,a)]$$
-  - Learning rate ($\eta$): 0.1
-  - Discount factor ($\gamma$): 0.9
-
-- **ϵ-Greedy Exploration**:
-  - Initial $\epsilon$: 1.0
-  - Decay: 0.99995 per episode
-  - Minimum $\epsilon$: 0.1
-
-- **State-Action Management**: Efficient indexing between 2D states and 1D table indices
-- **Training History**: Records episode rewards and exploration rates for analysis
-
-#### 3. **`baselines.py`** - Baseline Tutoring Strategies
-Two rule-based baseline methods for comparison.
-
-**Fixed Schedule (FS) Baseline:**
-- Deterministic difficulty progression
-- Cycles through Easy → Medium → Hard every 7 steps
-- Simple, non-adaptive approach
-
-**Performance Threshold (PT) Baseline:**
-- Threshold-based adaptation
-- Rules:
-  - Increase difficulty after 2 consecutive correct responses
-  - Decrease difficulty after 2 consecutive incorrect responses
-- Represents a simple adaptive strategy
-
-#### 4. **`train_evaluation.py`** - Training Orchestrator
-Manages training, evaluation, and comparative analysis.
-
-**Functions:**
-- `train_agent()`: Train the Q-Learning agent (~10,000 episodes × 20 steps = 200,000 interactions)
-- `evaluate_agent()`: Test trained agent on held-out episodes
-- `evaluate_baseline()`: Evaluate baseline strategies
-- `run_comparative_evaluation()`: Compare all three methods
-- `save_results()`: Persist evaluation metrics
-
-**Metrics Collected:**
-- Knowledge gains over episodes
-- Success rates (% correct responses)
-- Optimal challenge rates (% in productive struggle zone: 0.3 < P(Correct) < 0.7)
-- Total cumulative rewards
-
-#### 5. **`analyze.py`** - Analysis & Visualization
-Comprehensive statistical analysis and visual reporting.
-
-**Capabilities:**
-- **Training Progress Plots**: Reward trends and ϵ-decay visualization
-- **Comparative Bar Charts**: Side-by-side comparison of all metrics
-- **Distribution Plots**: Histogram analysis of metric distributions
-- **Statistical Testing**: Paired t-tests with effect size (Cohen's d)
-- **Policy Interpretability**: Heatmap visualization of learned decision policy
-- **Comprehensive Reports**: Summary statistics and conclusions
-
-#### 6. **`main.py`** - Execution Pipeline
-Orchestrates the complete workflow from training to analysis.
-
-**Pipeline Steps:**
-1. Initialize training orchestrator
-2. Train Q-Learning agent (10,000 episodes)
-3. Save trained Q-table and training history
-4. Run comparative evaluation (1,000 test episodes per method)
-5. Save and load results
-6. Generate visualizations
-7. Perform statistical tests
-8. Analyze learned policy
-9. Generate final report
-
----
-
-## Installation & Setup
-
-### Requirements
+### Prerequisites
 - Python 3.8+
-- Dependencies listed in `requirements.txt`
+- pip package manager
 
-### Quick Start
+### Installation
 
-1. **Install Dependencies**:
+1. **Clone the repository**
+```bash
+git clone https://github.com/yourusername/lightweight-adaptive-tutor.git
+cd lightweight-adaptive-tutor
+```
+2. **Install dependencies**
 ```bash
 pip install -r requirements.txt
 ```
-
-2. **Run the Complete Pipeline**:
+3. **Run the complete pipeline**
 ```bash
 python main.py
 ```
+## Expected Output
+After running, check the output/ directory for:
+- Trained Q-table (q_table.npy)
+- Training history and metrics (training_history.pkl)
+- Performance comparison visualizations (comparative_metrics.png)
+- Statistical analysis results (statistical_results.csv)
+- Policy heatmap visualizations (policy_visualization.png)
 
-3. **Output Files** (generated in `output/` directory):
-   - `q_table.npy` - Trained Q-table
-   - `training_history.pkl` - Training progress metrics
-   - `results.pkl` - Evaluation results
-   - `statistical_results.csv` - Statistical test results
-   - `training_progress.png` - Training visualizations
-   - `comparative_metrics.png` - Performance comparison charts
-   - `*_distributions.png` - Metric distribution plots
-   - `policy_visualization.png` - Learned policy heatmap
+## 📊 Performance Metrics
 
----
+The system evaluates tutoring strategies using:
 
-## Key Algorithms & Equations
+| Metric | Description | Expected RL Performance |
+|--------|-------------|-------------------------|
+| 📚 **Knowledge Gain** | Improvement in student knowledge | 📈 Higher than baselines |
+| ✅ **Success Rate** | % of correct answers | 🎯 70-85% with adaptation |
+| ⚖️ **Optimal Challenge** | % in productive struggle zone (0.3 < P(correct) < 0.7) | 🔝 Maximized by RL |
+| 🏆 **Cumulative Reward** | Total reward over episodes | 💪 Higher after convergence |
 
-### 1. Student Response Probability
-$$P(\text{Correct}|S_t, a_t) = \frac{1}{1 + e^{-\alpha(K_t - \beta_d)}}$$
-
-### 2. Knowledge Update
-$$K_{t+1} = \begin{cases} 
-K_t + \lambda_{\text{gain}} \cdot d & \text{if correct} \\
-K_t - \phi & \text{if incorrect}
-\end{cases}$$
-
-### 3. Q-Learning Bellman Update
-$$Q(s_t, a_t) \leftarrow Q(s_t, a_t) + \eta \left[r_t + \gamma \max_{a'} Q(s_{t+1}, a') - Q(s_t, a_t)\right]$$
-
-### 4. Policy Extraction
-$$\pi^*(s) = \arg\max_a Q(s, a)$$
-
-### 5. Statistical Significance (Cohen's d)
-$$d = \frac{\bar{x}_1 - \bar{x}_2}{\sqrt{(s_1^2 + s_2^2)/2}}$$
-
----
-
-## Configuration Parameters
-
-### Environment Parameters (`environment.py`)
-| Parameter | Value | Description |
-|-----------|-------|-------------|
-| `knowledge_levels` | 10 | Discrete knowledge level bins |
-| `consecutive_bounds` | 7 | Range for consecutive counter (-3 to +3) |
-| `alpha` | 5 | Sigmoid slope for response probability |
-| `lambda_gain` | 0.05 | Learning gain coefficient |
-| `phi` | 0.02 | Penalty for incorrect response |
-
-### Q-Learning Hyperparameters (`q_learning_agent.py`)
-| Parameter | Value | Description |
-|-----------|-------|-------------|
-| `learning_rate` (η) | 0.1 | Q-value update step size |
-| `discount_factor` (γ) | 0.9 | Future reward weight |
-| `epsilon_init` | 1.0 | Initial exploration rate |
-| `epsilon_min` | 0.1 | Minimum exploration rate |
-| `epsilon_decay` | 0.99995 | Per-episode decay |
-
-### Training Configuration (`main.py`)
-| Parameter | Value | Description |
-|-----------|-------|-------------|
-| `num_episodes` | 10,000 | Training episodes |
-| `steps_per_episode` | 20 | Steps per training episode |
-| `num_test_episodes` | 1,000 | Evaluation episodes per method |
-
----
-
-## Expected Results
-
-### Performance Metrics
-
-The system typically demonstrates:
-
-1. **Knowledge Gain**: Average improvement in student knowledge levels
-   - Expected: RL agent shows higher average gains than baselines
-
-2. **Success Rate**: Percentage of correctly answered questions
-   - Expected: 70-85% with adaptive selection
-
-3. **Optimal Challenge Rate**: Percentage of questions in productive struggle zone
-   - Expected: RL agent maximizes this rate compared to fixed baselines
-
-4. **Total Reward**: Cumulative reward over episodes
-   - Expected: RL agent shows higher cumulative rewards after convergence
-
-### Statistical Significance
-
-Results typically show:
-- Paired t-tests comparing RL vs. baselines (p < 0.05)
-- Cohen's d effect sizes indicating magnitude of improvements
-- More statistically significant results on optimal challenge rate metric
-
----
-
-## File Structure
-
-```
-Lightweight Adaptive Tutor (LAT) system/
-├── main.py                        # Main execution pipeline
-├── environment.py                 # Student knowledge simulator (MDP environment)
-├── q_learning_agent.py           # Q-Learning agent implementation
-├── baselines.py                  # Baseline tutoring strategies (FS, PT)
-├── train_evaluation.py           # Training orchestrator & evaluation
-├── analyze.py                    # Analysis & visualization
-├── requirements.txt              # Python dependencies
-├── README.md                     # This file
-├── __pycache__/                  # Python cache
-└── output/                       # Generated outputs
-    ├── q_table.npy              # Trained Q-table
-    ├── training_history.pkl     # Training metrics
-    ├── results.pkl              # Evaluation results
-    ├── statistical_results.csv  # Statistical tests
-    ├── training_progress.png    # Training plots
-    ├── comparative_metrics.png  # Performance comparison
-    ├── *_distributions.png      # Distribution plots
-    └── policy_visualization.png # Policy heatmap
-```
-
----
-
-## Methodology Notes
+## 🧪 Methodology
 
 ### Why Q-Learning?
-- **Simplicity**: Tabular representation suitable for small state spaces (70 states)
+- **Simplicity**: Tabular representation for small state spaces (70 states)
 - **Optimality**: Guaranteed convergence to optimal policy
-- **Interpretability**: Learned policy easily visualizable and explainable
+- **Interpretability**: Easily visualizable and explainable policies
 - **Efficiency**: Fast training and inference without neural networks
 
-### Why These Baselines?
-- **Fixed Schedule (FS)**: Represents non-adaptive tutoring (baseline)
-- **Performance Threshold (PT)**: Represents simple rule-based adaptation
-- **Comparison**: Validates that RL provides improvements over practical alternatives
+### Baseline Strategies
+1. **Fixed Schedule (FS)**: Non-adaptive, cyclic difficulty progression
+2. **Performance Threshold (PT)**: Simple rule-based adaptation based on consecutive responses
 
-### Hyperparameter Justification
-- **10 Knowledge Levels**: Sufficient granularity for student modeling
-- **7-Step Consecutive Counter**: Captures productive struggle patterns (-3 to +3)
-- **Learning Rate 0.1**: Balanced learning speed and stability
-- **Epsilon Decay 0.99995**: Gradual transition from exploration to exploitation
+## 📈 Results & Analysis
 
----
+The system generates comprehensive analysis including:
+- **Training progress plots** (rewards, ϵ-decay)
+- **Comparative performance bar charts**
+- **Metric distribution histograms**
+- **Statistical significance tests** (paired t-tests with Cohen's d)
+- **Policy heatmap visualizations**
 
-## Future Enhancements
+## 🔮 Future Enhancements
 
-- **Function Approximation**: Neural network Q-Learning for larger state spaces
-- **Transfer Learning**: Pre-train on synthetic student populations
-- **Multi-Student**: Simultaneous tutoring of multiple students
-- **Real Data Integration**: Validation with actual student interaction logs
-- **Pedagogical Constraints**: Incorporate educational best practices
-- **Exploration Strategies**: Thompson sampling or UCB instead of ϵ-greedy
-- **Curriculum Learning**: Structured knowledge progression
+- [ ] **Neural network function approximation** for larger state spaces
+- [ ] **Transfer learning** across student populations
+- [ ] **Multi-student simultaneous tutoring**
+- [ ] **Integration with real student interaction data**
+- [ ] **Advanced exploration strategies** (Thompson sampling, UCB)
+- [ ] **Curriculum learning** with structured knowledge progression
 
----
+## 🐛 Troubleshooting
 
-## Troubleshooting
+| Issue | Solution |
+|-------|----------|
+| **Q-table file not found** | Ensure `main.py` completes training. Check `output/` directory exists. |
+| **Low success rates** | May be expected with random initial students. Check training convergence. |
+| **Statistical tests not running** | Ensure sufficient evaluation episodes (minimum 1,000 per method). |
+| **Slow execution** | Reduce `num_episodes` for testing or implement parallel processing. |
 
-### Issue: Q-table file not found
-**Solution**: Ensure `main.py` completes training successfully. Check `output/` directory exists.
+## 📝 License
 
-### Issue: Low success rates
-**Solution**: This may be expected with random initial students. Check if agent has converged by examining training progress plots.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-### Issue: Statistical tests not running
-**Solution**: Ensure evaluation completed with sufficient episodes (minimum 1,000 per method recommended).
+## 🤝 Contributing
 
-### Issue: Slow execution
-**Solution**: Reduce `num_episodes` for testing, or use multi-processing if available.
+Contributions are welcome! Please feel free to submit a Pull Request.
 
----
+1. **Fork the repository**
+2. **Create your feature branch** (`git checkout -b feature/AmazingFeature`)
+3. **Commit your changes** (`git commit -m 'Add some AmazingFeature'`)
+4. **Push to the branch** (`git push origin feature/AmazingFeature`)
+5. **Open a Pull Request**
 
-## Performance Optimization Tips
+## 📚 Acknowledgments
 
-1. **Vectorization**: Already implemented with NumPy
-2. **Batch Processing**: Modify `train_evaluation.py` to batch episodes
-3. **Parallel Baselines**: Evaluate baselines in parallel
-4. **Early Stopping**: Monitor convergence and stop if no improvement
+- Built with **NumPy, Matplotlib, SciPy, Pandas, Scikit-learn**
+- Inspired by adaptive learning research and intelligent tutoring systems literature
+- Q-Learning algorithm from **Watkins & Dayan (1992)**
 
----
-
-## License
-
-MIT License - See LICENSE file for details
-
----
-
-## Contact & Support
+## 📞 Contact
 
 For questions, issues, or suggestions:
 - Open an issue in the repository
-- Submit a pull request with improvements
-- Contact: [your-email@example.com]
+- Contact: humaimaanwar123@gmail.com
 
 ---
 
-## Acknowledgments
-
-- Built with NumPy, Matplotlib, SciPy, Pandas, Scikit-learn
-- Inspired by adaptive learning research and ITS literature
-- Q-Learning algorithm from Watkins & Dayan (1992)
-
----
-
-**Last Updated**: December 2024
+**Last Updated**: December 2025 
 **Version**: 1.0
